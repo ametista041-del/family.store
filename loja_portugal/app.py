@@ -1,81 +1,65 @@
 import streamlit as st
-import streamlit.components.v1 as components
-from PIL import Image
-import os
 import re
+import os
 
-# 1. CONFIGURAÇÃO DA PÁGINA
+# 1. CONFIGURAÇÃO (AMARELO E ROSA)
 st.set_page_config(page_title="A&A Achadinhos", layout="wide", page_icon="🛍️")
 
-# --- ESTILO PERSONALIZADO ---
 st.markdown("""
 <style>
-    h1, h2, h3, h4 { color: #EAB308; } 
-    .stLinkButton button {
-        background-color: #F472B6 !important; 
-        color: white !important;
-        border-radius: 12px;
-        font-weight: bold;
-    }
+    h1, h2, h3, h4 { color: #EAB308 !important; } 
+    .stLinkButton button { background-color: #F472B6 !important; color: white !important; border-radius: 12px; font-weight: bold; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- FUNÇÃO VÍDEOS ---
-def formatar_link_video(url):
+# --- FUNÇÃO QUE "LIMPA" O LINK COPIADO DO TELEMÓVEL ---
+def limpar_link(url):
     url = str(url).strip()
-    if "youtube.com/shorts/" in url:
-        return url.replace("youtube.com/shorts/", "youtube.com/watch?v=")
+    # Pega o ID do vídeo mesmo que seja Shorts, link de partilha ou link normal
+    match = re.search(r"(?:v=|\/shorts\/|youtu\.be\/|\/embed\/|youtu\.be\/)([\w-]{11})", url)
+    if match:
+        video_id = match.group(1)
+        # Formato que o telemóvel NÃO BLOQUEIA:
+        return f"https://www.youtube.com/embed/{video_id}"
     return url
 
-# --- NOVA MEMÓRIA (Lê do Secrets para não esquecer no telemóvel) ---
-# Se não houver nada no Secrets, ele usa esses links de reserva:
-v_br_padrao = st.secrets.get("video_br", "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-l_br_padrao = st.secrets.get("link_br", "https://www.amazon.com.br/")
-v_pt_padrao = st.secrets.get("video_pt", "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-l_pt_padrao = st.secrets.get("link_pt", "https://www.amazon.es/-/pt/")
-
-# 2. PAINEL DE GESTÃO (Senha: noronha2026)
+# --- PAINEL LATERAL ---
 with st.sidebar:
     st.title("🔐 Painel A&A")
-    senha = st.text_input("Senha de Acesso:", type="password")
+    senha = st.text_input("Senha:", type="password")
     
     if senha == "noronha2026":
         st.success("Acesso Liberado!")
-        st.info("Para mudar o vídeo de vez no telemóvel, cole os links no menu 'Settings > Secrets' do seu painel Streamlit.")
-        loja_br = st.selectbox("Loja (BR):", ["A&A Achadinhos", "Amazon Brasil", "Shopee"], key="sbr")
-        loja_pt = st.selectbox("Loja (PT):", ["A&A Achadinhos", "Amazon Espanha", "Worten"], key="spt")
+        # Criamos as caixinhas onde você vai COLAR o link do telemóvel
+        v_br = st.text_input("Cole o Link do Vídeo (BR):", "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        l_br = st.text_input("Cole o Link da Loja (BR):", "https://amazon.com.br")
+        st.divider()
+        v_pt = st.text_input("Cole o Link do Vídeo (PT):", "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+        l_pt = st.text_input("Cole o Link da Loja (PT):", "https://amazon.es")
     else:
-        loja_br = "A&A Achadinhos"
-        loja_pt = "A&A Achadinhos"
+        v_br = v_pt = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        l_br = "https://amazon.com.br"
+        l_pt = "https://amazon.es"
 
-# 3. VITRINE PÚBLICA
+# --- LOGOTIPO ---
 nome_logo = "logotipo A&A.jpeg"
-if os.path.exists(nome_logo):
-    st.image(Image.open(nome_logo), width=350)
-else:
-    st.title("🛍️ A&A Achadinhos")
+if os.path.exists(nome_logo): st.image(nome_logo, width=300)
+else: st.title("🛍️ A&A Achadinhos")
 
-st.markdown("#### Seleção Especial: **Adriana & Anabel**")
 st.divider()
 
+# --- AS ABAS ---
 t_br, t_pt = st.tabs(["🇧🇷 Achados Brasil", "🇵🇹 Achados Portugal"])
 
-def mostrar_produto(video, loja, link):
+def mostrar(video, loja_link):
     c1, c2 = st.columns([1.5, 1])
     with c1:
-        st.subheader("🎬 Assista ao vídeo 👇")
-        v = formatar_link_video(video)
-        st.video(v)
+        link_limpo = limpar_link(video)
+        # O SEGREDO: Usar Iframe para o telemóvel carregar o vídeo na hora
+        st.markdown(f'<iframe width="100%" height="400" src="{link_limpo}" frameborder="0" allowfullscreen></iframe>', unsafe_allow_html=True)
     with c2:
-        st.subheader("💡 Por que você precisa disso?")
-        st.write("### O achadinho perfeito para o seu lar.")
-        st.divider()
-        st.link_button(f"🛒 COMPRAR NA {loja.upper()}", link, use_container_width=True)
+        st.write("### O achadinho perfeito!")
+        st.link_button("🛒 COMPRAR AGORA", loja_link, use_container_width=True)
 
-with t_br:
-    mostrar_produto(v_br_padrao, loja_br, l_br_padrao)
-with t_pt:
-    mostrar_produto(v_pt_padrao, loja_pt, l_pt_padrao)
-
-st.divider()
-st.caption("© 2026 A&A Achadinhos - Adriana Noronha")
+with t_br: mostrar(v_br, l_br)
+with t_pt: mostrar(v_pt, l_pt)

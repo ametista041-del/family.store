@@ -10,7 +10,7 @@ st.set_page_config(page_title="A&A Achadinhos", layout="wide", page_icon="üõçÔ∏
 # --- ESTILO PERSONALIZADO (Amarelo e Rosa) ---
 st.markdown("""
 <style>
-    h1, h2, h3, h4 { color: #EAB308; } 
+    h1, h2, h3, h4 { color: #EAB308 !important; } 
     .stLinkButton button {
         background-color: #F472B6 !important; 
         color: white !important;

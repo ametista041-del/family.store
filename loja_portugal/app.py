@@ -62,7 +62,7 @@ arquivo_logo = "logo_aa.jpg"
 
 try:
     img = Image.open(arquivo_logo)
-    st.image(img, width=350)
+    st.image(img, width=600)
 except:
     # Se ainda der erro, o site mostra o título para não ficar feio
     st.title("🛍️ A&A Achadinhos")

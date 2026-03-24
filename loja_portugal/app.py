@@ -32,7 +32,7 @@ def formatar_link_video(url):
     return url
 
 def gerar_iframe_video(url):
-    refresh_token = str(int(time.time()))
+    refresh_token = f"{int(time.time())}_{st.session_state.refresh_count}"
     if "instagram.com" in url:
         return url.rstrip('/') + "/embed?refresh=" + refresh_token
     elif "youtube.com/watch?v=" in url:
@@ -49,6 +49,9 @@ if 'dados' not in st.session_state:
         'pt_url': "https://www.amazon.es/-/pt/"
     }
 
+if 'refresh_count' not in st.session_state:
+    st.session_state.refresh_count = 0
+
 # 2. PAINEL DE GESTÃO
 with st.sidebar:
     st.title("🔐 Painel A&A")
@@ -58,14 +61,20 @@ with st.sidebar:
         st.success("Acesso Liberado!")
         st.divider()
         st.header("🇧🇷 Configuração Brasil")
-        st.session_state.dados['br_vid'] = st.text_input("Link Vídeo (BR):", st.session_state.dados['br_vid'])
+        novo_br = st.text_input("Link Vídeo (BR):", st.session_state.dados['br_vid'])
+        if novo_br != st.session_state.dados['br_vid']:
+            st.session_state.dados['br_vid'] = novo_br
+            st.session_state.refresh_count += 1
         loja_br = st.selectbox("Loja (BR):", ["A&A Achadinhos", "Amazon Brasil", "Shopee"], key="sbr")
         st.session_state.dados['br_url'] = st.text_input("Link de Compra (BR):", st.session_state.dados['br_url'])
         
         st.divider()
         
         st.header("🇵🇹 Configuração Portugal")
-        st.session_state.dados['pt_vid'] = st.text_input("Link Vídeo (PT):", st.session_state.dados['pt_vid'])
+        novo_pt = st.text_input("Link Vídeo (PT):", st.session_state.dados['pt_vid'])
+        if novo_pt != st.session_state.dados['pt_vid']:
+            st.session_state.dados['pt_vid'] = novo_pt
+            st.session_state.refresh_count += 1
         loja_pt = st.selectbox("Loja (PT):", ["A&A Achadinhos", "Amazon Espanha", "Worten"], key="spt")
         st.session_state.dados['pt_url'] = st.text_input("Link de Compra (PT):", st.session_state.dados['pt_url'])
     else:
@@ -73,7 +82,7 @@ with st.sidebar:
         loja_pt = "A&A Achadinhos"
 
 # 3. VITRINE PÚBLICA
-nome_logo = "logo_aa.jpg"  # nome correto no repositório
+nome_logo = "logo_aa.jpg"
 
 if os.path.exists(nome_logo):
     st.image(nome_logo, width=350)
@@ -94,12 +103,12 @@ def mostrar_produto(video, loja, link):
     c1, c2 = st.columns([1.5, 1])
     with c1:
         st.subheader("🎬 Assista ao vídeo 👇")
-        v = formatar_link_video(video)  # linha corrigida
+        v = formatar_link_video(video)
         iframe_url = gerar_iframe_video(v)
         if iframe_url and isinstance(iframe_url, str):
             components.iframe(iframe_url, height=500)
         else:
-            st.video(v)  # fallback seguro
+            st.video(v)
     with c2:
         st.subheader("💡 Por que você precisa disso?")
         st.write("### O achadinho perfeito para o seu lar.")

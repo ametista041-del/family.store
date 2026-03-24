@@ -2,6 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from PIL import Image
 import os
+import time
 
 # 1. CONFIGURAÇÃO DA PÁGINA
 st.set_page_config(page_title="A&A Achadinhos", layout="wide", page_icon="🛍️")
@@ -25,17 +26,21 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- FUNÇÃO VÍDEOS ---
+# --- FUNÇÕES DE CACHE ---
+def quebrar_cache_url(url):
+    return f"{url}?refresh={int(time.time())}"
+
 def formatar_link_video(url):
     if "youtube.com/shorts/" in url:
         return url.replace("youtube.com/shorts/", "youtube.com/watch?v=")
     return url
 
 def gerar_iframe_video(url):
+    refresh_token = str(int(time.time()))
     if "instagram.com" in url:
-        return url.rstrip('/') + "/embed"
+        return url.rstrip('/') + "/embed?refresh=" + refresh_token
     elif "youtube.com/watch?v=" in url:
-        return url.replace("watch?v=", "embed/")
+        return url.replace("watch?v=", "embed/") + "?refresh=" + refresh_token
     else:
         return None
 
@@ -75,13 +80,11 @@ with st.sidebar:
 nome_logo = "logotipo A&A.jpeg"
 
 if os.path.exists(nome_logo):
-    img = Image.open(nome_logo)
-    st.image(img, width=350)
+    st.image(quebrar_cache_url(nome_logo), width=350)
 else:
     caminho_alternativo = os.path.join("loja_portugal", nome_logo)
     if os.path.exists(caminho_alternativo):
-        img = Image.open(caminho_alternativo)
-        st.image(img, width=350)
+        st.image(quebrar_cache_url(caminho_alternativo), width=350)
     else:
         st.title("🛍️ A&A Achadinhos")
 
@@ -100,7 +103,7 @@ def mostrar_produto(video, loja, link):
         if iframe_url:
             components.iframe(iframe_url, height=500)
         else:
-            st.video(v)  # fallback para outros formatos
+            st.video(quebrar_cache_url(v))  # fallback com quebra de cache
     with c2:
         st.subheader("💡 Por que você precisa disso?")
         st.write("### O achadinho perfeito para o seu lar.")

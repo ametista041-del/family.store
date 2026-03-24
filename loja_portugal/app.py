@@ -2,12 +2,11 @@ import streamlit as st
 import streamlit.components.v1 as components
 from PIL import Image
 import os
-import re
 
 # 1. CONFIGURAÇÃO DA PÁGINA
 st.set_page_config(page_title="A&A Achadinhos", layout="wide", page_icon="🛍️")
 
-# --- ESTILO ---
+# --- ESTILO PERSONALIZADO ---
 st.markdown("""
 <style>
     h1, h2, h3 { color: #EAB308; } 
@@ -23,15 +22,12 @@ st.markdown("""
 # --- FUNÇÃO VÍDEOS ULTRA-BLINDADA ---
 def preparar_video(url):
     url = url.strip()
-    # Se for link de SHORTS, extrai o ID e transforma em vídeo comum
     if "shorts/" in url:
         video_id = url.split("shorts/")[1].split("?")[0].split("&")[0]
         return f"https://www.youtube.com/watch?v={video_id}"
-    # Se for link curto (youtu.be)
     if "youtu.be/" in url:
         video_id = url.split("/")[-1].split("?")[0]
         return f"https://www.youtube.com/watch?v={video_id}"
-    # Se for link padrão com lixo
     if "watch?v=" in url:
         video_id = url.split("v=")[1].split("&")[0]
         return f"https://www.youtube.com/watch?v={video_id}"
@@ -52,11 +48,11 @@ with st.sidebar:
     senha = st.text_input("Senha:", type="password")
     if senha == "noronha2026":
         st.success("Acesso Liberado!")
-        st.session_state.dados['br_vid'] = st.text_input("Link Shorts/Vídeo (BR):", st.session_state.dados['br_vid'])
+        st.session_state.dados['br_vid'] = st.text_input("Link Vídeo (BR):", st.session_state.dados['br_vid'])
         loja_br = st.selectbox("Loja (BR):", ["A&A Achadinhos", "Amazon Brasil", "Shopee"], key="sbr")
         st.session_state.dados['br_url'] = st.text_input("Link Compra (BR):", st.session_state.dados['br_url'])
         st.divider()
-        st.session_state.dados['pt_vid'] = st.text_input("Link Shorts/Vídeo (PT):", st.session_state.dados['pt_vid'])
+        st.session_state.dados['pt_vid'] = st.text_input("Link Vídeo (PT):", st.session_state.dados['pt_vid'])
         loja_pt = st.selectbox("Loja (PT):", ["A&A Achadinhos", "Amazon Espanha", "Worten"], key="spt")
         st.session_state.dados['pt_url'] = st.text_input("Link Compra (PT):", st.session_state.dados['pt_url'])
     else:
@@ -64,7 +60,9 @@ with st.sidebar:
         loja_pt = "A&A Achadinhos"
 
 # 3. VITRINE
-arquivo_logo = "logo_aa.jpg"
+# Nome exato da imagem que está no seu GitHub
+arquivo_logo = "logotipo A&A.jpeg"
+
 if os.path.exists(arquivo_logo):
     img = Image.open(arquivo_logo)
     st.image(img, width=600)
@@ -80,7 +78,6 @@ def mostrar(video, loja, link):
     c1, c2 = st.columns([1.5, 1])
     with c1:
         st.subheader("🎬 Assista ao vídeo 👇")
-        # AQUI ACONTECE A MÁGICA DA CONVERSÃO
         link_limpo = preparar_video(video)
         st.video(link_limpo)
     with c2:

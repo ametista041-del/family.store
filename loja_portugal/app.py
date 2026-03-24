@@ -60,4 +60,57 @@ with st.sidebar:
         st.header("🇧🇷 Configuração Brasil")
         st.session_state.dados['br_vid'] = st.text_input("Link Vídeo (BR):", st.session_state.dados['br_vid'])
         loja_br = st.selectbox("Loja (BR):", ["A&A Achadinhos", "Amazon Brasil", "Shopee"], key="sbr")
-        st.session_state.dados['br_url'] = st.text_input("Link de Compra (
+        st.session_state.dados['br_url'] = st.text_input("Link de Compra (BR):", st.session_state.dados['br_url'])
+        
+        st.divider()
+        
+        st.header("🇵🇹 Configuração Portugal")
+        st.session_state.dados['pt_vid'] = st.text_input("Link Vídeo (PT):", st.session_state.dados['pt_vid'])
+        loja_pt = st.selectbox("Loja (PT):", ["A&A Achadinhos", "Amazon Espanha", "Worten"], key="spt")
+        st.session_state.dados['pt_url'] = st.text_input("Link de Compra (PT):", st.session_state.dados['pt_url'])
+    else:
+        loja_br = "A&A Achadinhos"
+        loja_pt = "A&A Achadinhos"
+
+# 3. VITRINE PÚBLICA
+nome_logo = "logo_aa.jpg"  # nome correto no repositório
+
+if os.path.exists(nome_logo):
+    st.image(nome_logo, width=350)
+else:
+    caminho_alternativo = os.path.join("loja_portugal", nome_logo)
+    if os.path.exists(caminho_alternativo):
+        st.image(caminho_alternativo, width=350)
+    else:
+        st.title("🛍️ A&A Achadinhos")
+
+st.markdown("#### Seleção Especial: **Adriana & Anabel**")
+st.caption("Soluções baratas e úteis que facilitam sua rotina. 💖")
+st.divider()
+
+t_br, t_pt = st.tabs(["🇧🇷 Achados Brasil", "🇵🇹 Achados Portugal"])
+
+def mostrar_produto(video, loja, link):
+    c1, c2 = st.columns([1.5, 1])
+    with c1:
+        st.subheader("🎬 Assista ao vídeo 👇")
+        v = formatar_link_video(video)  # linha corrigida
+        iframe_url = gerar_iframe_video(v)
+        if iframe_url and isinstance(iframe_url, str):
+            components.iframe(iframe_url, height=500)
+        else:
+            st.video(v)  # fallback seguro
+    with c2:
+        st.subheader("💡 Por que você precisa disso?")
+        st.write("### O achadinho perfeito para o seu lar.")
+        st.write("Curadoria feita com carinho para economizar seu tempo e dinheiro.")
+        st.divider()
+        st.link_button(f"🛒 COMPRAR NA {loja.upper()}", link, use_container_width=True)
+
+with t_br:
+    mostrar_produto(st.session_state.dados['br_vid'], loja_br, st.session_state.dados['br_url'])
+with t_pt:
+    mostrar_produto(st.session_state.dados['pt_vid'], loja_pt, st.session_state.dados['pt_url'])
+
+st.divider()
+st.caption("© 2026 A&A Achadinhos - Inteligência em Organização Familiar.")

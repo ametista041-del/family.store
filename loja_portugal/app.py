@@ -19,7 +19,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- FUNÇÃO PARA LIMPAR LINKS DE TELEMÓVEL/SHORTS ---
+# --- FUNÇÃO DE LIMPEZA DE LINKS ---
 def preparar_video(url):
     url = url.strip()
     padrao = r"(?:v=|\/shorts\/|\/embed\/|\/v\/|youtu\.be\/|\/watch\?v=|\/watch\?.+&v=)([\w-]{11})"
@@ -29,34 +29,30 @@ def preparar_video(url):
         return f"https://www.youtube.com/embed/{video_id}"
     return url
 
-# --- 2. CONFIGURAÇÃO DOS PRODUTOS (VITRINE OFICIAL) ---
-# Adriana, mude os links abaixo para atualizar o site e o telemóvel de uma só vez:
-
+# --- 2. VITRINE OFICIAL (Mude aqui para atualizar em todo lugar) ---
 dados_venda = {
-    'br_vid': "https://www.youtube.com/watch?v=dQw4w9WgXcQ", # COLE O LINK DO VÍDEO BRASIL AQUI
-    'br_url': "https://www.amazon.com.br/",                 # COLE O LINK DE COMPRA BRASIL AQUI
-    
-    'pt_vid': "https://www.youtube.com/watch?v=dQw4w9WgXcQ", # COLE O LINK DO VÍDEO PORTUGAL AQUI
-    'pt_url': "https://www.amazon.es/-/pt/",                # COLE O LINK DE COMPRA PORTUGAL AQUI
-    
-    'br_desc': "Achadinho exclusivo para facilitar o seu dia no Brasil!",
-    'pt_desc': "A solução ideal selecionada para a sua casa em Portugal!"
+    'br_vid': "https://www.youtube.com/watch?v=dQw4w9WgXcQ", 
+    'br_url': "https://www.amazon.com.br/",
+    'pt_vid': "https://www.youtube.com/watch?v=dQw4w9WgXcQ", 
+    'pt_url': "https://www.amazon.es/-/pt/",
+    'br_desc': "Achadinho exclusivo selecionado para você no Brasil!",
+    'pt_desc': "A solução ideal para sua casa em Portugal!"
 }
 
 # --- 3. EXIBIÇÃO DO LOGO ---
-arquivo_logo = "logo_aa.jpg"
-if os.path.exists(arquivo_logo):
-    st.image(arquivo_logo, width=500)
-elif os.path.exists(f"loja_portugal/{arquivo_logo}"):
-    st.image(f"loja_portugal/{arquivo_logo}", width=500)
+# O código procura o seu logo_aa.jpg
+if os.path.exists("logo_aa.jpg"):
+    st.image("logo_aa.jpg", width=400)
+elif os.path.exists("loja_portugal/logo_aa.jpg"):
+    st.image("loja_portugal/logo_aa.jpg", width=400)
 else:
     st.title("🛍️ A&A Achadinhos")
 
 st.markdown("#### Curadoria Especial: **Adriana & Anabel**")
 st.divider()
 
-# --- 4. VITRINE POR ABAS ---
-t_br, t_pt = st.tabs(["🇧🇷 Brasil", "🇵🇹 Portugal"])
+# --- 4. AS ABAS (BRASIL E PORTUGAL) ---
+t_br, t_pt = st.tabs(["🇧🇷 Achados Brasil", "🇵🇹 Achados Portugal"])
 
 def mostrar_produto(video, desc, link, label):
     c1, c2 = st.columns([1.5, 1])

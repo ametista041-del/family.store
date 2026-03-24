@@ -1,10 +1,17 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-# 1. CONFIGURAÇÃO DO SITE
+# 1. CONFIGURAÇÃO
 st.set_page_config(page_title="Curadoria Adriana Noronha", layout="wide", page_icon="🏠")
 
-# --- MEMÓRIA DE SEGURANÇA ---
+# --- FUNÇÃO INTELIGENTE PARA VÍDEOS ---
+def formatar_link_video(url):
+    # Se for link de Shorts, transforma em link de vídeo comum para o player aceitar
+    if "youtube.com/shorts/" in url:
+        return url.replace("youtube.com/shorts/", "youtube.com/watch?v=")
+    return url
+
+# --- MEMÓRIA DOS LINKS ---
 if 'dados' not in st.session_state:
     st.session_state.dados = {
         'br_vid': "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
@@ -13,54 +20,49 @@ if 'dados' not in st.session_state:
         'pt_url': "https://www.amazon.es/-/pt/"
     }
 
-# 2. PAINEL DE GESTÃO (BARRA LATERAL)
+# 2. PAINEL DE GESTÃO
 with st.sidebar:
-    st.title("⚙️ Painel de Abastecimento")
+    st.title("⚙️ Gestão de Ofertas")
     
-    # SEÇÃO BRASIL
-    st.header("🇧🇷 Configurar Brasil")
+    st.header("🇧🇷 Mercado Brasil")
     st.session_state.dados['br_vid'] = st.text_input("Link do Vídeo (BR):", st.session_state.dados['br_vid'])
-    loja_br = st.selectbox("Escolha a Loja (BR):", 
-                           ["Amazon Brasil", "Mercado Livre", "Shopee", "Magalu", "Outra"], key="sel_br")
+    loja_br = st.selectbox("Loja no Botão (BR):", 
+                           ["Loja Family", "Loja Noronha", "Loja Freitas", "Amazon Brasil", "Mercado Livre", "Outra"], key="sel_br")
     st.session_state.dados['br_url'] = st.text_input(f"Link de destino (BR):", st.session_state.dados['br_url'])
 
     st.divider()
 
-    # SEÇÃO PORTUGAL
-    st.header("🇵🇹 Configurar Portugal")
+    st.header("🇵🇹 Mercado Portugal")
     st.session_state.dados['pt_vid'] = st.text_input("Link do Vídeo (PT):", st.session_state.dados['pt_vid'])
-    loja_pt = st.selectbox("Escolha a Loja (PT):", 
-                           ["Amazon Espanha", "IKEA Portugal", "Temu", "Worten", "Outra"], key="sel_pt")
+    loja_pt = st.selectbox("Loja no Botão (PT):", 
+                           ["Loja Family", "Loja Noronha", "Loja Freitas", "Amazon Espanha", "IKEA Portugal", "Outra"], key="sel_pt")
     st.session_state.dados['pt_url'] = st.text_input(f"Link de destino (PT):", st.session_state.dados['pt_url'])
 
-# 3. O SITE (VISÃO DO CLIENTE)
+# 3. VITRINE
 st.title("🏠 Soluções Práticas: Brasil & Portugal")
 st.markdown("#### Curadoria e Gestão: **Adriana Noronha**")
 st.divider()
 
 tab_br, tab_pt = st.tabs(["🇧🇷 Loja Brasil", "🇵🇹 Loja Portugal"])
 
-# Função que desenha a vitrine e atualiza o botão automaticamente
 def desenhar_vitrine(video, nome_loja, link_loja, msg):
     col_v, col_t = st.columns([1.5, 1])
     with col_v:
         st.subheader("📺 Veja a Solução")
-        if "instagram.com" in video:
-            components.iframe(video.rstrip('/') + "/embed", height=500)
+        video_limpo = formatar_link_video(video) # Aplica a correção aqui
+        
+        if "instagram.com" in video_limpo:
+            components.iframe(video_limpo.rstrip('/') + "/embed", height=500)
         else:
-            st.video(video)
+            st.video(video_limpo)
     with col_t:
         st.subheader("🎯 Recomendação da Adriana")
         st.write(msg)
         st.divider()
-        # O NOME DO BOTÃO AGORA MUDA DE ACORDO COM O SELECTBOX
-        st.link_button(f"🛒 Comprar na {nome_loja}", link_loja, use_container_width=True)
+        st.link_button(f"🛒 Ir para a {nome_loja}", link_loja, use_container_width=True)
 
 with tab_br:
     desenhar_vitrine(st.session_state.dados['br_vid'], loja_br, st.session_state.dados['br_url'], "Curadoria para sua casa no Brasil.")
 
 with tab_pt:
     desenhar_vitrine(st.session_state.dados['pt_vid'], loja_pt, st.session_state.dados['pt_url'], "Curadoria para sua nova rotina em Portugal.")
-
-st.divider()
-st.caption("Adriana Noronha - Inteligência em Organização e Gestão.")

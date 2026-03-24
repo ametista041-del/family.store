@@ -26,16 +26,14 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- FUNÇÕES DE CACHE ---
-def quebrar_cache_url(url):
-    return f"{url}?refresh={int(time.time())}"
-
+# --- FUNÇÃO VÍDEOS ---
 def formatar_link_video(url):
     if "youtube.com/shorts/" in url:
         return url.replace("youtube.com/shorts/", "youtube.com/watch?v=")
     return url
 
 def gerar_iframe_video(url):
+    # Adiciona parâmetro único para quebrar cache
     refresh_token = str(int(time.time()))
     if "instagram.com" in url:
         return url.rstrip('/') + "/embed?refresh=" + refresh_token
@@ -80,11 +78,13 @@ with st.sidebar:
 nome_logo = "logotipo A&A.jpeg"
 
 if os.path.exists(nome_logo):
-    st.image(quebrar_cache_url(nome_logo), width=350)
+    img = Image.open(nome_logo)
+    st.image(img, width=350)
 else:
     caminho_alternativo = os.path.join("loja_portugal", nome_logo)
     if os.path.exists(caminho_alternativo):
-        st.image(quebrar_cache_url(caminho_alternativo), width=350)
+        img = Image.open(caminho_alternativo)
+        st.image(img, width=350)
     else:
         st.title("🛍️ A&A Achadinhos")
 
@@ -103,7 +103,7 @@ def mostrar_produto(video, loja, link):
         if iframe_url:
             components.iframe(iframe_url, height=500)
         else:
-            st.video(quebrar_cache_url(v))  # fallback com quebra de cache
+            st.video(v)  # fallback para outros formatos
     with c2:
         st.subheader("💡 Por que você precisa disso?")
         st.write("### O achadinho perfeito para o seu lar.")

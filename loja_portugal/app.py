@@ -28,14 +28,10 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- FUNÇÃO VÍDEOS (Ajuste para converter o link automaticamente) ---
+# --- FUNÇÃO VÍDEOS ---
 def formatar_link_video(url):
-    url = str(url).strip()
-    # Converte links de Shorts ou Normais para o formato que o telemóvel aceita
-    import re
-    id_match = re.search(r"(?:v=|\/shorts\/|youtu\.be\/|\/embed\/)([\w-]{11})", url)
-    if id_match:
-        return f"https://www.youtube.com/embed/{id_match.group(1)}"
+    if "youtube.com/shorts/" in url:
+        return url.replace("youtube.com/shorts/", "youtube.com/watch?v=")
     return url
 
 # --- MEMÓRIA ---
@@ -71,12 +67,16 @@ with st.sidebar:
         loja_pt = "A&A Achadinhos"
 
 # 3. VITRINE PÚBLICA
+
+# O SEGREDO ESTÁ AQUI: O nome tem que ser igual ao que está na raiz do seu GitHub
+# Como seu arquivo está fora da pasta 'loja_portugal', usamos '../' para o código achar
 nome_logo = "logotipo A&A.jpeg"
 
 if os.path.exists(nome_logo):
     img = Image.open(nome_logo)
     st.image(img, width=350)
 else:
+    # Se ele não achar na raiz, tenta procurar dentro da pasta
     caminho_alternativo = os.path.join("loja_portugal", nome_logo)
     if os.path.exists(caminho_alternativo):
         img = Image.open(caminho_alternativo)
@@ -95,8 +95,10 @@ def mostrar_produto(video, loja, link):
     with c1:
         st.subheader("🎬 Assista ao vídeo 👇")
         v = formatar_link_video(video)
-        # O SEGREDO PARA O TELEMÓVEL: Usar Iframe em vez de st.video
-        st.markdown(f'<iframe width="100%" height="400" src="{v}" frameborder="0" allowfullscreen></iframe>', unsafe_allow_html=True)
+        if "instagram.com" in v:
+            components.iframe(v.rstrip('/') + "/embed", height=500)
+        else:
+            st.video(v)
     with c2:
         st.subheader("💡 Por que você precisa disso?")
         st.write("### O achadinho perfeito para o seu lar.")

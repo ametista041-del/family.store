@@ -6,7 +6,7 @@ import os
 # 1. CONFIGURAÇÃO DA PÁGINA
 st.set_page_config(page_title="A&A Achadinhos", layout="wide", page_icon="🛍️")
 
-# --- ESTILO PERSONALIZADO (Rosa e Amarelo do seu Logo) ---
+# --- ESTILO PERSONALIZADO ---
 st.markdown("""
 <style>
     h1, h2, h3 { color: #EAB308; } 
@@ -15,9 +15,6 @@ st.markdown("""
         color: white !important;
         border-radius: 12px;
         font-weight: bold;
-    }
-    .stLinkButton button:hover {
-        background-color: #EAB308 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -45,12 +42,12 @@ with st.sidebar:
     if senha == "noronha2026":
         st.success("Acesso Liberado!")
         st.divider()
-        st.header("🇧🇷 Brasil")
+        st.header("🇧🇷 Configurar Brasil")
         st.session_state.dados['br_vid'] = st.text_input("Link Vídeo (BR):", st.session_state.dados['br_vid'])
         loja_br = st.selectbox("Loja (BR):", ["A&A Achadinhos", "Amazon Brasil", "Shopee"], key="sbr")
         st.session_state.dados['br_url'] = st.text_input("Link Compra (BR):", st.session_state.dados['br_url'])
         st.divider()
-        st.header("🇵🇹 Portugal")
+        st.header("🇵🇹 Configurar Portugal")
         st.session_state.dados['pt_vid'] = st.text_input("Link Vídeo (PT):", st.session_state.dados['pt_vid'])
         loja_pt = st.selectbox("Loja (PT):", ["A&A Achadinhos", "Amazon Espanha", "Worten"], key="spt")
         st.session_state.dados['pt_url'] = st.text_input("Link Compra (PT):", st.session_state.dados['pt_url'])
@@ -60,17 +57,18 @@ with st.sidebar:
 
 # 3. VITRINE PÚBLICA (Onde o Logo aparece)
 
-# O nome abaixo tem que ser IGUALZINHO ao arquivo no GitHub
-nome_do_arquivo = "logotipo A&A.jpeg"
+# Comando direto para o novo nome do arquivo
+arquivo_logo = "logo_aa.jpg"
 
-if os.path.exists(nome_do_arquivo):
-    img = Image.open(nome_do_arquivo)
+try:
+    img = Image.open(arquivo_logo)
     st.image(img, width=350)
-else:
+except:
+    # Se ainda der erro, o site mostra o título para não ficar feio
     st.title("🛍️ A&A Achadinhos")
 
 st.markdown("#### Seleção Especial: **Adriana & Anabel**")
-st.caption("A curadoria que une mãe e filha para facilitar o seu lar. 💖")
+st.caption("Curadoria de mãe e filha para o seu lar. 💖")
 st.divider()
 
 t_br, t_pt = st.tabs(["🇧🇷 Achados Brasil", "🇵🇹 Achados Portugal"])

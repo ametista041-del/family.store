@@ -96,3 +96,4 @@ with t_pt:
 
 st.divider()
 st.caption("© 2026 A&A Achadinhos")
+

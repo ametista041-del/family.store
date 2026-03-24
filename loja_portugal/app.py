@@ -7,10 +7,13 @@ import re
 # 1. CONFIGURAÇÃO DA PÁGINA
 st.set_page_config(page_title="A&A Achadinhos", layout="wide", page_icon="🛍️")
 
-# --- ESTILO PERSONALIZADO (Amarelo e Rosa) ---
+# --- ESTILO PERSONALIZADO (Cores do seu Logo: Amarelo e Rosa) ---
 st.markdown("""
 <style>
-    h1, h2, h3, h4 { color: #EAB308 !important; } 
+    /* Cor dos Títulos */
+    h1, h2, h3, h4 { color: #EAB308; } 
+    
+    /* Botão de Compra Personalizado */
     .stLinkButton button {
         background-color: #F472B6 !important; 
         color: white !important;
@@ -26,14 +29,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- FUNÇÃO QUE LIMPA O LINK PARA O TELEMÓVEL ---
+# --- FUNÇÃO VÍDEOS (AJUSTADA PARA FUNCIONAR NO TELEMÓVEL) ---
 def formatar_link_video(url):
     url = str(url).strip()
-    # Pega o ID do vídeo (Shorts, YouTube comum ou Partilha)
+    # Esta parte converte links normais e shorts para um formato que o celular aceita sempre
     id_match = re.search(r"(?:v=|\/shorts\/|youtu\.be\/|\/embed\/)([\w-]{11})", url)
     if id_match:
         video_id = id_match.group(1)
-        # Formato Embed: O único que o telemóvel não bloqueia
         return f"https://www.youtube.com/embed/{video_id}"
     return url
 
@@ -54,13 +56,14 @@ with st.sidebar:
     if senha == "noronha2026":
         st.success("Acesso Liberado!")
         st.divider()
-        st.header("🇧🇷 Brasil")
+        st.header("🇧🇷 Configuração Brasil")
         st.session_state.dados['br_vid'] = st.text_input("Link Vídeo (BR):", st.session_state.dados['br_vid'])
         loja_br = st.selectbox("Loja (BR):", ["A&A Achadinhos", "Amazon Brasil", "Shopee"], key="sbr")
         st.session_state.dados['br_url'] = st.text_input("Link de Compra (BR):", st.session_state.dados['br_url'])
         
         st.divider()
-        st.header("🇵🇹 Portugal")
+        
+        st.header("🇵🇹 Configuração Portugal")
         st.session_state.dados['pt_vid'] = st.text_input("Link Vídeo (PT):", st.session_state.dados['pt_vid'])
         loja_pt = st.selectbox("Loja (PT):", ["A&A Achadinhos", "Amazon Espanha", "Worten"], key="spt")
         st.session_state.dados['pt_url'] = st.text_input("Link de Compra (PT):", st.session_state.dados['pt_url'])
@@ -68,14 +71,17 @@ with st.sidebar:
         loja_br = "A&A Achadinhos"
         loja_pt = "A&A Achadinhos"
 
-# 3. LOGOTIPO (ESTRUTURA ORIGINAL)
+# 3. VITRINE PÚBLICA
 nome_logo = "logotipo A&A.jpeg"
+
 if os.path.exists(nome_logo):
-    st.image(Image.open(nome_logo), width=350)
+    img = Image.open(nome_logo)
+    st.image(img, width=350)
 else:
     caminho_alternativo = os.path.join("loja_portugal", nome_logo)
     if os.path.exists(caminho_alternativo):
-        st.image(Image.open(caminho_alternativo), width=350)
+        img = Image.open(caminho_alternativo)
+        st.image(img, width=350)
     else:
         st.title("🛍️ A&A Achadinhos")
 
@@ -83,19 +89,22 @@ st.markdown("#### Seleção Especial: **Adriana & Anabel**")
 st.caption("Soluções baratas e úteis que facilitam sua rotina. 💖")
 st.divider()
 
-# --- AS ABAS ---
 t_br, t_pt = st.tabs(["🇧🇷 Achados Brasil", "🇵🇹 Achados Portugal"])
 
 def mostrar_produto(video, loja, link):
     c1, c2 = st.columns([1.5, 1])
     with c1:
         st.subheader("🎬 Assista ao vídeo 👇")
-        v_limpo = formatar_link_video(video)
-        # USA IFRAME PARA FUNCIONAR NO TELEMÓVEL SEM ERRO
-        st.markdown(f'<iframe width="100%" height="450" src="{v_limpo}" frameborder="0" allowfullscreen></iframe>', unsafe_allow_html=True)
+        v = formatar_link_video(video)
+        # Se for Instagram, usa o componente dele. Se for YouTube, usa o formato Embed (que não falha no celular)
+        if "instagram.com" in v:
+            components.iframe(v.rstrip('/') + "/embed", height=500)
+        else:
+            st.markdown(f'<iframe width="100%" height="400" src="{v}" frameborder="0" allowfullscreen></iframe>', unsafe_allow_html=True)
     with c2:
         st.subheader("💡 Por que você precisa disso?")
         st.write("### O achadinho perfeito para o seu lar.")
+        st.write("Curadoria feita com carinho para economizar seu tempo e dinheiro.")
         st.divider()
         st.link_button(f"🛒 COMPRAR NA {loja.upper()}", link, use_container_width=True)
 
@@ -105,4 +114,4 @@ with t_pt:
     mostrar_produto(st.session_state.dados['pt_vid'], loja_pt, st.session_state.dados['pt_url'])
 
 st.divider()
-st.caption("© 2026 A&A Achadinhos - Adriana Noronha")
+st.caption("© 2026 A&A Achadinhos - Inteligência em Organização Familiar.")

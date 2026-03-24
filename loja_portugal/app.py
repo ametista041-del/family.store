@@ -63,7 +63,7 @@ with st.sidebar:
 nome_logo = "logo_aa.jpg" 
 
 if os.path.exists(nome_logo):
-    st.image(nome_logo, width=350)
+    st.image(nome_logo, width=600)
 else:
     st.title("🛍️ A&A Achadinhos")
 
